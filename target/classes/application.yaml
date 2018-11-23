@@ -1,0 +1,24 @@
+server:
+  port: 8081
+  context-path: /auction2.2
+  jsp-servlet:
+    init-parameters:
+      development: true
+spring:
+  mvc:
+    view:
+      prefix: /
+      suffix: .jsp
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/test
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+mybatis:
+  mapper-locations: com/baizhi/auction2_2/dao/*Dao.xml
+  type-aliases-package: com.baizhi.auction2_2.entity

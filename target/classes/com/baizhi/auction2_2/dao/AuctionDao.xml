@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.baizhi.auction2_2.dao.AuctionDao" >
+		<resultMap type="Auction" id="auctionMap">
+			<id  property="id" column="auction_id" />
+			<result property="name" column="auction_name"/>
+			<result property="startPrice" column="auction_start_price"/>
+			<result property="upset" column="auction_upset"/>
+			<result property="startTime" column="auction_start_time"/>
+			<result property="endTime" column="auction_end_time"/>
+			<result property="pic" column="auction_pic"/>
+			<result property="desc" column="auction_desc"/>
+			<collection property="reList" ofType="Record">
+				<result property="user_id" column="user_id"/>
+				<result property="auction_time" column="auction_time"/>
+				<result property="auction_price" column="auction_price"/>
+				<association property="auctionUser" javaType="AuctionUser">
+					<result property="userName" column="user_name"/>
+				</association>
+			
+			</collection>
+			
+		</resultMap>						
+		<select id="selectAll" resultMap="auctionMap">
+				select*from auction
+				<where>
+					<!-- <if test="auction!=null and auction.name!=null">
+						and auction_name like #{auction.name}
+					</if> -->
+					
+					<if test="name!=null">
+						and auction_name like #{name}
+					</if>
+					<if test="desc!=null">
+						and auction_desc like #{desc}
+					</if>
+					<if test="startTime!=null">
+						and auction_start_time <![CDATA[>=]]>#{startTime} 	
+					</if>
+					<if test="endTime!=null">
+						and auction_end_time <![CDATA[<=]]>#{endTime}				
+					</if>
+					<if test="startPrice!=null">
+						and auction_start_price <![CDATA[>=]]>#{startPrice}
+					</if>
+				</where>
+		</select>
+		
+		<delete id="delete" >
+				delete from auction where auction_id=#{id}
+		</delete>
+		
+		<insert id="insert">
+				insert into auction values(auc_seq.nextval,#{name},#{startPrice},#{upset},#{startTime},#{endTime},#{pic},#{desc})
+		</insert>
+		
+		<select id="selectOne" resultMap="auctionMap"> 
+				select *from auction where auction_id=#{id}
+		</select>
+		
+		<update id="update" >
+				<!-- update auction set auction_name=#{name} ,auction_start_price=#{startPrice} 
+				,auction_upset=#{upset},auction_start_time=#{startTime},auction_end_time=#{endTime}, 
+				auction_pic=#{pic} ,auction_desc=#{desc}
+				where auction_id=#{id}  -->
+				
+				<!-- 通过修改的动态sql完成 -->
+				update auction
+				<set>
+					auction_name=#{name} ,auction_start_price=#{startPrice} 
+					,auction_upset=#{upset},auction_start_time=#{startTime},auction_end_time=#{endTime},auction_desc=#{desc},
+					<if test="pic!=null">auction_pic=#{pic}</if>
+				</set>
+				where auction_id=#{id}
+				
+		</update>
+		<select id="selectRecord" resultMap="auctionMap">
+				select e.*,au.user_name from 
+					(select a.*,ar.user_id,ar.auction_time,auction_price  
+					 from auction a left join auction_record ar
+					on a.auction_id=ar.auction_id
+					where a.auction_id=#{auId}) e 
+					left join auction_user au
+					on e.user_id=au.user_id
+					order by e.auction_price desc
+		</select>
+		
+		
+		
+</mapper>
